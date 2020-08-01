@@ -99,7 +99,6 @@ def simulate(game, ply=2):
     moves = game.find_best_moves(game.players[game.currentPlayer].rack, 5)
     threads = []
     for move in moves:
-        thread_func(move, game, ply, avgDifferentials)
         threads.append(threading.Thread(target=thread_func, args=(move, game, ply,)))
     for th in threads:
         th.start()
