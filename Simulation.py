@@ -97,7 +97,7 @@ def thread_func(move, game, ply, lock):
 
 
 def simulate(game, ply=2):
-    lock = Lock()
+    lock = threading.Lock()
     print('hi')
     moves = game.find_best_moves(game.players[game.currentPlayer].rack, 5)
     threads = []
