@@ -65,7 +65,7 @@ def mapBoardToState(game, leave):
 
 
 
-def thread_func(move, game, ply, avgDifferentials):
+def thread_func(move, game, ply):
     lettersUsed = game.board.get_letters_used(move[2], move[0], move[3])
     lettersLeft = game.players[game.currentPlayer].rack[:]
     for letter in game.players[game.currentPlayer].rack:
@@ -74,7 +74,6 @@ def thread_func(move, game, ply, avgDifferentials):
         elif letter in lettersUsed:
             lettersLeft.remove(letter)
     print(lettersLeft)
-    avg_diff = 0
     for _ in range(10):
         temp_board = copy.deepcopy(game.board)
         temp_players = copy.deepcopy(game.players)
@@ -92,23 +91,19 @@ def thread_func(move, game, ply, avgDifferentials):
         diff = temp_game.players[temp_game.currentPlayer].score - temp_game.players[not temp_game.currentPlayer].score
         state['scoreDifferentialAfterXPly'] = diff
         saveExample(state)
-        avg_diff += diff
-    avgDifferentials.append((move, avg_diff/10))
 
 
 def simulate(game, ply=2):
     print('hi')
     moves = game.find_best_moves(game.players[game.currentPlayer].rack, 5)
-    avgDifferentials = []
     threads = []
     for move in moves:
         thread_func(move, game, ply, avgDifferentials)
-        # threads.append(threading.Thread(target=thread_func, args=(move, game, ply, avgDifferentials,)))
-    # for th in threads:
-    #     th.start()
-    # for th in threads:
-    #     th.join()
-    # avgDifferentials.sort(key=lambda x: x[1], reverse=True)
+        threads.append(threading.Thread(target=thread_func, args=(move, game, ply,)))
+    for th in threads:
+        th.start()
+    for th in threads:
+        th.join()
 
 
 def main():
@@ -124,20 +119,3 @@ if __name__ == "__main__":
     main()
 
 
-
-# a.playBestMove()
-# a.playBestMove()
-# a.playBestMove()
-# print(a.board)
-# print(a.players[0].score - a.players[1].score)
-# print(a.players[0].rack)
-# simulate(a)
-
-
-
-
-
-# moves = self.find_best_moves(self.players[self.currentPlayer].rack)
-# # print(moves)
-# self.players[self.currentPlayer].score += moves[0][1]
-# self.play(moves[0][2], moves[0][0], moves[0][3])
