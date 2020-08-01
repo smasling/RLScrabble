@@ -7,7 +7,8 @@ import json
 
 counter = 0
 
-def saveExample(state):
+def saveExample(state, lock):
+    lock.acquire()
     with open('examples.json', 'r') as f:
         config = json.load(f)
     if len(config["examples"]) == 0:
@@ -16,6 +17,7 @@ def saveExample(state):
         config["examples"].append(state)
     with open('examples.json','w') as f:
         json.dump(config, f)
+    lock.release()
 
 
 
@@ -65,7 +67,7 @@ def mapBoardToState(game, leave):
 
 
 
-def thread_func(move, game, ply):
+def thread_func(move, game, ply, lock):
     lettersUsed = game.board.get_letters_used(move[2], move[0], move[3])
     lettersLeft = game.players[game.currentPlayer].rack[:]
     for letter in game.players[game.currentPlayer].rack:
@@ -83,7 +85,7 @@ def thread_func(move, game, ply):
         temp_game.exchangeSeven(not temp_game.currentPlayer)
         temp_game.players[temp_game.currentPlayer].score += move[1]
         temp_game.play(move[2], move[0], move[3])
-        state = mapBoardToState(temp_game, lettersLeft)
+        state = mapBoardToState(temp_game, lettersLeft, lock)
         temp_game.playBestMove()
         for __ in range(ply - 1):
             temp_game.playBestMove()
@@ -95,11 +97,12 @@ def thread_func(move, game, ply):
 
 
 def simulate(game, ply=2):
+    lock = Lock()
     print('hi')
     moves = game.find_best_moves(game.players[game.currentPlayer].rack, 5)
     threads = []
     for move in moves:
-        threads.append(threading.Thread(target=thread_func, args=(move, game, ply,)))
+        threads.append(threading.Thread(target=thread_func, args=(move, game, ply, lock,)))
     for th in threads:
         th.start()
     for th in threads:
