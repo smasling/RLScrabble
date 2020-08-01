@@ -73,7 +73,7 @@ def thread_func(move, game, ply):
             lettersLeft.remove("?")
         elif letter in lettersUsed:
             lettersLeft.remove(letter)
-    print(lettersLeft)
+    print(lettersLeft, move[0])
     for _ in range(10):
         temp_board = copy.deepcopy(game.board)
         temp_players = copy.deepcopy(game.players)
@@ -91,6 +91,7 @@ def thread_func(move, game, ply):
         diff = temp_game.players[temp_game.currentPlayer].score - temp_game.players[not temp_game.currentPlayer].score
         state['scoreDifferentialAfterXPly'] = diff
         saveExample(state)
+    print(move[0])
 
 
 def simulate(game, ply=2):
