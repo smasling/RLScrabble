@@ -85,14 +85,14 @@ def thread_func(move, game, ply, lock):
         temp_game.exchangeSeven(not temp_game.currentPlayer)
         temp_game.players[temp_game.currentPlayer].score += move[1]
         temp_game.play(move[2], move[0], move[3])
-        state = mapBoardToState(temp_game, lettersLeft, lock)
+        state = mapBoardToState(temp_game, lettersLeft)
         temp_game.playBestMove()
         for __ in range(ply - 1):
             temp_game.playBestMove()
             temp_game.playBestMove()
         diff = temp_game.players[temp_game.currentPlayer].score - temp_game.players[not temp_game.currentPlayer].score
         state['scoreDifferentialAfterXPly'] = diff
-        saveExample(state)
+        saveExample(state, lock)
     print(move[0])
 
 
